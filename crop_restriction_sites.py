@@ -30,7 +30,7 @@ def crop_sites(args):
     def process_files(name):
         left, left_out, right, right_out = make_file_names(name, args.directory)
         counts = defaultdict(int)
-        with gzip.open(left_out, 'wt') as left_outfile, gzip.open(right_out, 'wt') as right_outfile, gzip.open(left, 'rt') as left_infile, gzip.open(right, 'rt') as right_infile:
+        with gzip.open(left_out, mode='wt', compresslevel=9) as left_outfile, gzip.open(right_out, mode='wt', compresslevel=9) as right_outfile, gzip.open(left, 'rt') as left_infile, gzip.open(right, 'rt') as right_infile:
             print('Processing sequences for ', name)
             for left_seq, right_seq in itertools.izip(SeqIO.parse(left_infile, 'fastq'), SeqIO.parse(right_infile, 'fastq')):
                 left_match = left_seq.seq.find(args.restriction_site)
@@ -45,7 +45,7 @@ def crop_sites(args):
 
                 match_type = 'both'
                 if left_match > -1 and not right_match > -1:
-                    match_tye = 'left'
+                    match_type = 'left'
                 elif right_match > -1 and not left_match > -1:
                     match_type = 'right'
 
