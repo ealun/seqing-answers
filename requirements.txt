@@ -1,0 +1,2 @@
+biopython==1.72
+joblib==0.12.2
