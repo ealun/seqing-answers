@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 from collections import defaultdict
+import gzip
 import itertools
 import multiprocessing
 import os
@@ -14,9 +15,9 @@ _SUFFIX = 'fastq.gz'
 
 def make_file_names(name, directory):
     left = os.path.join(directory, '{}_1.{}'.format(name, _SUFFIX))
-    left_out = os.path.join(directory, '{}_1_resitefound.fastq'.format(name))
+    left_out = os.path.join(directory, '{}_1_resitefound.{}'.format(name, _SUFFIX))
     right = os.path.join(directory, '{}_2.{}'.format(name, _SUFFIX))
-    right_out = os.path.join(directory, '{}_2_resitefound.fastq'.format(name))
+    right_out = os.path.join(directory, '{}_2_resitefound.{}'.format(name, _SUFFIX))
     return left, left_out, right, right_out
 
 
@@ -29,9 +30,9 @@ def crop_sites(args):
     def process_files(name):
         left, left_out, right, right_out = make_file_names(name, args.directory)
         counts = defaultdict(int)
-        with open(left_out, 'w') as left_outfile, open(right_out, 'w') as right_outfile:
+        with gzip.open(left_out, 'wt') as left_outfile, gzip.open(right_out, 'wt') as right_outfile, gzip.open(left, 'rt') as left_infile, gzip.open(right, 'rt') as right_infile:
             print('Processing sequences for ', name)
-            for left_seq, right_seq in itertools.izip(SeqIO.parse(left, 'fastq'), SeqIO.parse(right, 'fastq')):
+            for left_seq, right_seq in itertools.izip(SeqIO.parse(left_infile, 'fastq'), SeqIO.parse(right_infile, 'fastq')):
                 left_match = left_seq.seq.find(args.restriction_site)
                 right_match = right_seq.seq.find(args.restriction_site)
 
